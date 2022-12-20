@@ -1,0 +1,84 @@
+--------------------------------------------------------------------------------
+--1. 다음의 메시지를 출력하시오.
+--(배점: 10점, 난이도: 2)
+SET SERVEROUTPUT ON;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('SQL 응용');
+    DBMS_OUTPUT.PUT_LINE('임성구');
+END;
+/* 결과
+SQL 응용
+임성구
+*/
+
+--------------------------------------------------------------------------------
+-- 2. PL/SQL의 SELECT문으로 EMP데이블에서 TURNER의 사원번호, 이름, 
+--부서번호를 조회하시오. (배점: 20점, 난이도: 3)
+DECLARE
+    SNO EMP.EMPNO%TYPE;
+    SNAME EMP.ENAME%TYPE;
+    DNO EMP.DEPTNO%TYPE;
+BEGIN
+    SELECT EMPNO,ENAME,DEPTNO INTO SNO, SNAME, DNO
+    FROM EMP
+    WHERE ENAME = 'TURNER';
+    
+    DBMS_OUTPUT.PUT_LINE('사번  이름   부서번호');
+    DBMS_OUTPUT.PUT_LINE('---------------------');
+    DBMS_OUTPUT.PUT_LINE(' '||SNO||' '||SNAME||' '||DNO);
+END;
+
+/* 결과
+사번  이름   부서번호
+---------------------
+ 7844 TURNER 30
+*/
+ 
+--------------------------------------------------------------------------------
+--3. PL/SQL의 다중 if..then..elsif..else문을 이용하여 TURNER의 사원번호, 
+--이름, 부서번호, 부서명을 조회하시오. (배점: 20점, 난이도: 3)
+DECLARE
+    SEMP EMP%ROWTYPE;
+    DNAME VARCHAR2(14);
+BEGIN
+    SELECT * INTO SEMP
+    FROM EMP
+    WHERE ENAME = 'TURNER';
+    
+    IF(SEMP.DEPTNO=10) THEN
+        DNAME := 'ACCOUNTING';
+    ELSIF (SEMP.DEPTNO=20) THEN
+        DNAME := 'RESEARCH';
+    ELSIF (SEMP.DEPTNO=30) THEN
+        DNAME := 'SALES';
+    ELSIF (SEMP.DEPTNO=40) THEN
+        DNAME := 'OPERATIONS';    
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('사번 이름 부서번호 부서명');
+    DBMS_OUTPUT.PUT_LINE('----------------------');
+    DBMS_OUTPUT.PUT_LINE(''||SEMP.EMPNO||' '||SEMP.ENAME||' '||SEMP.DEPTNO||' '||DNAME);
+END;
+/* 결과
+사번 이름 부서번호 부서명
+----------------------
+7844 TURNER 30 SALES
+*/
+
+--------------------------------------------------------------------------------
+-- 4. PL/SQL의 WHILE문을 사용하여 1부터 200까지 합을 구하는 
+--PL/SQL 문을 coding하시오. (배점: 50점, 난이도: 4)
+DECLARE
+    NUM NUMBER := 0;
+    CNT NUMBER := 0;
+BEGIN
+    WHILE (CNT < 200) LOOP    
+        CNT := CNT + 1;
+        NUM := NUM + CNT;        
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('1부터200까지 합은 : '||NUM);
+END;
+/* 결과
+1부터200까지 합은 : 20100
+*/
+--------------------------------------------------------------------------------

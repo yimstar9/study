@@ -1,0 +1,7 @@
+git init						git 저장소 생성하기  
+git remote add origin <등록된 원격 서버 주소>		클라우드 주소 등록 및 발행(git에게 새로운 원격 서버 주소 알림)
+git remote remove <등록된 클라우드 주소>		클라우드 주소 삭제
+
+git add -A
+git commit -m "desktop"
+git push -u --force study main

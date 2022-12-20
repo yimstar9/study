@@ -1,0 +1,117 @@
+import requests
+
+def Login():
+    Login_param = {
+        'id' : 'yimstar9',
+        'pwd' : 'dlatjdrn1!'
+    }
+    Login_header = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    response = requests.post("http://ic.smartjoeun.co.kr/rtMember/index00_Proc.html", data=Login_param, headers=Login_header, verify=False)#, proxies='https://127.0.0.1')
+    session = response.headers.get('Set-Cookie')
+
+    print(session)
+
+    return session
+
+def progress(session):
+
+
+
+'''refer 용
+def selectRentInfo(session):
+    selectRentInfo_param = {
+        'centerId': '01',
+        'placeCode': '23',
+        'eventCode': '64',
+        'playCode': '01'
+        log_num=30888&ch_num=2721&sch_num={31692}&lec_num2=2879&lec_num=2879&lec_class_num=642&kiganDate=2022-10-22&lec_code=202281212&studyYNFlag=Y&gpage={1}&mem_id=yimstar9&eval_cd=01&kvalue=14&captcha=&otpval=1&url=%2Fvod%2Fgong%2F235%2Findex.html&orcs_yn_fg=&MAC_LOGIN=&ip_login=&CaptchaUrl=&k_count=1&emon_id=lms105a001&timechk=
+    }
+    selectRentInfo_header = {
+        'Cookie': session,
+        'Referer': 'http://ic.smartjoeun.co.kr/rtSub07/index00.html?log_num=30888&chk=0',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    response = requests.post(cfg.selectRentInfo, data=selectRentInfo_param, headers=selectRentInfo_header,
+                             verify=False)
+
+'''
+
+
+if __name__ == "__main__":
+    session = Login()
+    progress(session)
+
+
+URL 알고 있음
+쿠키 : 서버에서 나를 인증(증명)하는 정보
+
+1. LOGIN 
+http://ic.smartjoeun.co.kr/rtMember/index00_Proc.html
+> 
+
+
+def Login():
+    Login_param = {
+        'password': cfg.login_PW_HASH[i],
+        'username': cfg.login_ID[i]
+		''' mac_add=&id=yimstar9&x=25&y=38&pwd=%40Dkdlvoem12&on_de_chk=1
+		'''
+    }
+    Login_header = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        
+    }
+
+    response = requests.post(cfg.Login, data=Login_param, headers=Login_header, verify=False, proxies=cfg.proxies)
+    session = response.request.headers.get('Cookie')
+    print(session)
+
+    return session
+
+
+
+2. 프로그레스 업데이트?
+http://ic.smartjoeun.co.kr/player/progress_settime.asp?settime=3000
+
+파라미터는
+
+
+헤더는 
+Content-Type: application/x-www-form-urlencoded
+Referer: http://ic.smartjoeun.co.kr/rtSub07/index00.html?log_num=30888&chk=0
+Cookie: ASPSESSIONIDAQBCQBAA=랑, ~~~~~~~
+dreamsoft=~~~
+
+
+
+
+######################################################
+POST /player/progress_settime.asp?settime=300 HTTP/1.1
+Host: ic.smartjoeun.co.kr
+Content-Length: 320
+Accept: application/json, text/javascript, */*; q=0.01
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.107 Safari/537.36
+Content-Type: application/x-www-form-urlencoded
+Origin: http://ic.smartjoeun.co.kr
+Referer: http://ic.smartjoeun.co.kr/rtSub07/index00.html?log_num=30889&chk=0
+Accept-Encoding: gzip, deflate
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: ASPSESSIONIDAQDDRDBB=PPKDOMBDLLKBKFBKPHKMFDOG; _ga=GA1.3.242224318.1668179538; _gid=GA1.3.1547737227.1668179538; dreamsoft=dADk0Uh2y%2FRVNOfwkhuDZg%3D%3D=xffJ0YPpw9m30ErqeOoaeA%3D%3D%3D&BTcFR4CHqWhwamPbBdCCiw%3D%3D=T3iHUF%2FQQ4V%2B6IL2vz28YA%3D%3D%3D&ueLx1kfuOmkVI%2FhqEtb%2BLw%3D%3D=xs%2ButLn%2BnKvJm6nw%2B125%2Bw%3D%3D%3D&%2BfOqAltLEAP4hVr3xtKLlQ%3D%3D=MMD8GC3%2FRrH9xQzUnefNgw%3D%3D%3D&OVFym%2F41p%2FepN%2FBZuzdQbQ%3D%3D=uXrGF2UUzBrRiRih5hVlfT4zB65nM0NpH%2Bt9M9Heshw%3D%3D&raw2AZoUnS3CbouU49nlSg%3D%3D=gJXFbvzBl6n%2FBm%2BhxBUcMQ%3D%3D%3D&Gn8nE70rKV%2B8nWH8gyuLBQ%3D%3D=uua0xoLKI3BJL6N%2BOWgW9w%3D%3D%3D&H%2BNGn20oGy2nHcsLco6BLg%3D%3D=G6SuiR%2F%2F9APF%2BPdZrcGybg%3D%3D%3D&CUAsDiSLN08ayFWlXZpbPg%3D%3D=DZNBA9yCd%2BiUGIqgbPAL8GEh53oBv5VpTluGv17cSH0%3D%3D&T43twoAiFg5iQHoedqRkGw%3D%3D=lqHv5prPWhoL8x0effdPNQ%3D%3D%3D&FhrZ%2FvzO0YAKWUOXTAdQVg%3D%3D=L5KTcWnDjsWmyeIy%2BvwXEw%3D%3D%3D&kOdn989Edb8gEyRxM9kAyQ%3D%3D=G6SuiR%2F%2F9APF%2BPdZrcGybg%3D%3D%3D&MxDnZJRyIho0t7onLPiOuA%3D%3D=dqdk2UI3h7zkvICkM4NMD2Eh53oBv5VpTluGv17cSH0%3D%3D&fq%2FACescKJ4A4IRxx5y33g%3D%3D=um9SxvQyvezbE0sIJhtslXU%2BvSOvN2fA%2FIT0OqvuUREXUXVfdKgx8gVzbnBRInuiwAcgQ5YQWpJq%2BShHeTSO1g%3D%3D%3D&3n2XbWxMiKJwCTTH%2FsxGNA%3D%3D=04RZKrt0jxJEYnhLmxJb8g%3D%3D%3D&qDi1YGJcfBnHGNroeGrL7w%3D%3D=04RZKrt0jxJEYnhLmxJb8g%3D%3D%3D&4%2FbNbEeJnmsnkWjuel5I4g%3D%3D=04RZKrt0jxJEYnhLmxJb8g%3D%3D%3D&bryKLyioXddze5A3BirnQQ%3D%3D=3NiZm14y7MUaAuQQ8O5%2FGA%3D%3D%3D&AMgiLHzUn2lmkDGJlGkk8Q%3D%3D=arIwgna03sm46Ztk5q0JzA%3D%3D%3D&Qa4hCycbVx6B7%2FQpfwrbfw%3D%3D=QFWwcQf0N5Qmos5n2dPdgw%3D%3D%3D&ml5CwtAfxii%2F%2F75LG0TkCg%3D%3D=BwepPBWb2rfTJoqcClDB2DciXxLk1geYhXhNkSSmiOk%3D%3D&att%5Flec%5Fnum2880=2880&5UgOUwTXbS6f%2F9kmgwnFAw%3D%3D=AhvUksm%2BnJwQvJ%2Bf%2FUvn9A%3D%3D%3D&xq6bWppMni53E%2FO8EctmcQ%3D%3D=GyaZoz%2BBbIgQDxfRGWVHkw%3D%3D%3D&dJxBnY3nSly8Zzo3fCK4vQ%3D%3D=%2B0w39QlcslMyTX%2FThUlcGQ%3D%3D%3D&RW0grGnwuqtnBttcNk8yng%3D%3D=h89soHcYMzOlYjHMCfRpkA%3D%3D%3D&mNacCKnnBNVPBUJQOSCfMw%3D%3D=AhvUksm%2BnJwQvJ%2Bf%2FUvn9A%3D%3D%3D&EtNZICd6mRzn2zk116h4mw%3D%3D=AhvUksm%2BnJwQvJ%2Bf%2FUvn9A%3D%3D%3D&XxnIIjo0KnoQKkyt6zMzQg%3D%3D=r5Y5KX%2BzXSe1USrU8QWbTA%3D%3D%3D&WpskNfILEhSIH1ZehCGGjw%3D%3D=LIvd8cl9fFV1zV2FaA9T9%2Bhckuai0T1FK9Z9f7m36nk%3D%3D&U%2FkaW4ZkqVaFnK6UibygLw%3D%3D=G6SuiR%2F%2F9APF%2BPdZrcGybg%3D%3D%3D&u4mMStbpzAZyGzznR0ReDw%3D%3D=OUzmYIXkMXhHvuO8crFO1Q%3D%3D%3D&dOYVJ1PRiy7OjpqxCUMZsQ%3D%3D=NX3V7lij%2B7wnIDeXxRnRbA%3D%3D%3D
+Connection: close
+
+log_num=30889&ch_num=2722&sch_num=31693&lec_num2=2880&lec_num=2880&lec_class_num=642&kiganDate=2022-11-12&lec_code=202281213&studyYNFlag=Y&gpage=6&mem_id=yimstar9&eval_cd=01&kvalue=1&captcha=&otpval=1&url=%2Fvod%2Fgong%2F346%2Findex.html&orcs_yn_fg=&MAC_LOGIN=&ip_login=&CaptchaUrl=&k_count=0&emon_id=lms105a001&timechk=
+X-Requested-With: XMLHttpRequest
+
+
+
+
+log_num=30889&ch_num=2722&
+sch_num=31694
+&lec_num2=2880&lec_num=2880&lec_class_num=642&kiganDate=2022-11-12&lec_code=202281213&studyYNFlag=Y&
+gpage=8
+&mem_id=yimstar9&eval_cd=01&kvalue=1&captcha=&otpval=1&url=%2Fvod%2Fgong%2F346%2Findex.html&orcs_yn_fg=&MAC_LOGIN=
+&ip_login=&CaptchaUrl=&k_count=0&emon_id=lms105a001&timechk=
