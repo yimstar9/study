@@ -9,9 +9,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-id = 'yimstar9'   #네이버 ID
-pw = 'a16729438' #네이버 패스워드
+id=input("id:")
+pw=input("pw:")
+id = id   #네이버 ID
+pw = pw #네이버 패스워드
 site_url = 'https://nid.naver.com/nidlogin.login?svctype=262144&amp;url=http://undefined/aside/'    #네이버 모바일 로그인 URL
 
 #크롬 실행

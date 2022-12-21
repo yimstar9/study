@@ -157,7 +157,7 @@ if __name__ == "__main__":
     for k in range(ct):
         print("###", k + 1, "회 시작 ###")
         session = Login(ID,PW)
-
+                                ###30892 인공지능자연어처리
         txt=info(session,30892) ####무슨강의 들을건지 숫자 자리에 번호 넣어줘야함
         if not txt:             ####강의 목록에서 수강버튼 post 보내면 log_num parameter값
             print("입력값 에러")

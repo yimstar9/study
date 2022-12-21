@@ -85,15 +85,9 @@ plt.legend()
 plt.show
 
 
-y_train_mean=round(sum(y_train)/len(y_train),2)
-SST = sum((y_train-y_train_mean)**2)
-
 from sklearn.metrics import r2_score
 print(r2_score(y_test,predict))
-SSR=sum(er)
-SSE=sum(se)
-SSR/(SSR+SSE)
-SSE/(SSR+SSE)
+
 ##########################################
 #2번
 #################################
@@ -263,18 +257,11 @@ plt.show()
 #######################################
 #3번
 #####################################
-import os
 import tensorflow.compat.v1 as tf
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-#tf.debugging.set_log_device_placement(True)
 from SyncRNG import SyncRNG
 import pandas as pd
-
 import matplotlib.pyplot as plt
-
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
 
 # 데이터 불러오기
 raw_data = pd.read_csv('E:/GoogleDrive/절대삭제노노/포트폴리오/A5팀 R과 Python기반 머신러닝과 딥러닝 분석 비교(12월22일)/dataset/iris.csv')

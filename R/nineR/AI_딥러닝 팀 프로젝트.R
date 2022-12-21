@@ -7,7 +7,7 @@ library(caret)
 #install.packages("SyncRNG")
 
 
-df<-read.csv("dataset2/product.csv")
+df<-read.csv("E:/GoogleDrive/DATASET/dataset2/product.csv")
 df
 head(df)
 summary(df)
@@ -27,7 +27,7 @@ idx[1:length(idx)]
 train <- df[idx,]
 test <- df[-idx,]
 str(train)
-# 
+ 
 # idx<-createDataPartition(df$제품_만족도,p=0.7,list=T)
 # train<-df[idx$Resample1,]
 # test<-df[-idx$Resample1,]
