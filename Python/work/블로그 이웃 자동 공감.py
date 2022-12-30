@@ -8,8 +8,8 @@ from selenium.webdriver.common.alert import Alert
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-id = 'ID'   #네이버 ID
-pw = 'PW' #네이버 패스워드
+id = ''   #네이버 ID
+pw = '' #네이버 패스워드
 site_url = 'https://nid.naver.com/nidlogin.login?svctype=262144&amp;url=http://undefined/aside/'    #네이버 모바일 로그인 URL
 
 #크롬 실행
