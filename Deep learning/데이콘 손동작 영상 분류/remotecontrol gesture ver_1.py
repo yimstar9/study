@@ -10,18 +10,19 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
-
+from cvzone.HandTrackingModule import HandDetector
+detector = HandDetector(detectionCon=0.8, maxHands=2)
 # import albumentations as A
 # from albumentations.pytorch.transforms import ToTensorV2
 # import torchvision.models as models
-
+import mediapipe as mp
 from tqdm.auto import tqdm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 
 import warnings
 warnings.filterwarnings(action='ignore')
-
+black_canvas = np.zeros((128, 128, 3), dtype="uint8")
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 CFG = {
@@ -32,6 +33,12 @@ CFG = {
     'BATCH_SIZE':2,
     'SEED':41
 }
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+hands = mp_hands.Hands(
+    max_num_hands=1,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5)
 
 def seed_everything(seed):
     random.seed(seed)
@@ -67,15 +74,34 @@ class CustomDataset(Dataset):
         return len(self.video_path_list)
 
     def get_video(self, path):
-        frames = []
+        frames=[]
         cap = cv2.VideoCapture(path)
-        for _ in range(CFG['FPS']):
+        while cap.get(cv2.CAP_PROP_POS_FRAMES) != cap.get(cv2.CAP_PROP_FRAME_COUNT):
             _, img = cap.read()
+            result = hands.process(img)
+            if result.multi_hand_landmarks is not None:
+                for res in result.multi_hand_landmarks:
+                    mp_drawing.draw_landmarks(img, res, mp_hands.HAND_CONNECTIONS)
+            # cv2.imshow('img', img)
+            # if cv2.waitKey(1) == ord('q'):
+            #     break
             img = cv2.resize(img, (CFG['IMG_SIZE'], CFG['IMG_SIZE']))
             img = img / 255.
             frames.append(img)
         return torch.FloatTensor(np.array(frames)).permute(3, 0, 1, 2)
 
+# cap = cv2.VideoCapture('train/TRAIN_277.mp4')
+
+
+# while cap.get(cv2.CAP_PROP_POS_FRAMES) != cap.get(cv2.CAP_PROP_FRAME_COUNT):
+#     _, img = cap.read()
+#     result = hands.process(img)
+#     if result.multi_hand_landmarks is not None:
+#         for res in result.multi_hand_landmarks:
+#             mp_drawing.draw_landmarks(img, res, mp_hands.HAND_CONNECTIONS)
+#     cv2.imshow('img', img)
+#     if cv2.waitKey(1) == ord('q'):
+#         break
 
 
 
@@ -90,10 +116,10 @@ class BaseModel(nn.Module):
     def __init__(self, num_classes=5):
         super(BaseModel, self).__init__()
         self.feature_extract = nn.Sequential(
-            nn.Conv3d(3, 8, (3, 3, 3)),
+            nn.Conv3d(3, 3, (3, 3,3)),
             nn.ReLU(),
-            nn.BatchNorm3d(8),
-            nn.MaxPool3d(2),
+            nn.BatchNorm2d(8),
+            nn.MaxPool2d(2),
             nn.Conv3d(8, 32, (2, 2, 2)),
             nn.ReLU(),
             nn.BatchNorm3d(32),

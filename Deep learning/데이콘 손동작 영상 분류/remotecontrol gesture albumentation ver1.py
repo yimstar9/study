@@ -11,9 +11,9 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
-# import albumentations as A
-# from albumentations.pytorch.transforms import ToTensorV2
-# import torchvision.models as models
+import albumentations as A
+from albumentations.pytorch.transforms import ToTensorV2
+import torchvision.models as models
 
 from tqdm.auto import tqdm
 from sklearn.model_selection import train_test_split
@@ -32,6 +32,8 @@ CFG = {
     'BATCH_SIZE':2,
     'SEED':41
 }
+mean = [0.45, 0.45, 0.45]
+std = [0.225, 0.225, 0.225]
 
 def seed_everything(seed):
     random.seed(seed)
@@ -46,14 +48,14 @@ seed_everything(CFG['SEED']) # Seed 고정
 
 df = pd.read_csv('./train.csv')
 
-train, val, _, _ = train_test_split(df, df['label'], test_size=0.2, random_state=CFG['SEED'])
+train, val, _, _ = train_test_split(df, df['label'], test_size=0.3, random_state=CFG['SEED'])
 
 
 class CustomDataset(Dataset):
-    def __init__(self, video_path_list, label_list):
+    def __init__(self, video_path_list, label_list, transforms=None):
         self.video_path_list = video_path_list
         self.label_list = label_list
-
+        self.transforms = transforms
     def __getitem__(self, index):
         frames = self.get_video(self.video_path_list[index])
 
@@ -69,20 +71,77 @@ class CustomDataset(Dataset):
     def get_video(self, path):
         frames = []
         cap = cv2.VideoCapture(path)
-        for _ in range(CFG['FPS']):
+        for i in range(CFG['FPS']):
             _, img = cap.read()
-            img = cv2.resize(img, (CFG['IMG_SIZE'], CFG['IMG_SIZE']))
-            img = img / 255.
-            frames.append(img)
-        return torch.FloatTensor(np.array(frames)).permute(3, 0, 1, 2)
+
+            if self.transforms:
+                #img=img.transpose(0,1,2)
+                img = self.transforms(image=img)['image']
+            #img = cv2.resize(img, (CFG['IMG_SIZE'], CFG['IMG_SIZE']))
+            #img = img / 255.
+            # if img.type == 'tensor':
+            #     frames.append(img.numpy())
+            # else:
+            #     frames.append(img)
+            try:
+               frames.append(img.numpy())
+            except Exception as e:
+                print('예외가 발생했습니다.', e)
+        return torch.FloatTensor(np.array(frames)).permute(1, 0, 2, 3)
+        #return torch.FloatTensor(np.array(frames)).permute(3, 0, 1, 2)
 
 
+train_transform = A.Compose([
+    A.Resize(CFG['IMG_SIZE'] , CFG['IMG_SIZE']),
+    #A.HorizontalFlip(), # Same with transforms.RandomHorizontalFlip()
+    A.Rotate(limit=20, p=1),
+    #A.ShiftScaleRotate(shift_limit=0, scale_limit=(0.5, 0.9), rotate_limit=0,p=1),#스케일
+    #A.ShiftScaleRotate(shift_limit=(0.2, 0.2), scale_limit=0, rotate_limit=20,p=1), #shift
+    #A.ShiftScaleRotate(shift_limit=0.2, scale_limit=(0.5, 0.9), rotate_limit=30,p=1,border_mode=cv2.BORDER_REPLICATE),
+    #A.RandomBrightnessContrast(brightness_limit=(-0.8, 0.8), contrast_limit=0,p=1),
+    A.Normalize(mean, std),
+    A.pytorch.transforms.ToTensorV2()
+])
+test_transform = A.Compose([
+    A.Resize(CFG['IMG_SIZE'] , CFG['IMG_SIZE']),
+    #A.HorizontalFlip(), # Same with transforms.RandomHorizontalFlip()
+    A.Rotate(limit=20, p=1),
+    #A.ShiftScaleRotate(shift_limit=0, scale_limit=(0.5, 0.9), rotate_limit=0,p=1),#스케일
+    #A.ShiftScaleRotate(shift_limit=(0.2, 0.2), scale_limit=0, rotate_limit=20,p=1), #shift
+    #A.ShiftScaleRotate(shift_limit=0.2, scale_limit=(0.5, 0.9), rotate_limit=30,p=1,border_mode=cv2.BORDER_REPLICATE),
+    #A.RandomBrightnessContrast(brightness_limit=(-0.8, 0.8), contrast_limit=0,p=1),
+    A.Normalize(mean, std),
+    A.pytorch.transforms.ToTensorV2()
+])
+
+# frames = []
+# cap = cv2.VideoCapture('train/TRAIN_277.mp4')
+# for i in range(CFG['FPS']):
+#     _, img = cap.read()
+#
+#     if train_transform is not None:
+#         # img=img.transpose(0,1,2)
+#         img = train_transform(image=img)['image']
+#     # img = cv2.resize(img, (CFG['IMG_SIZE'], CFG['IMG_SIZE']))
+#     # img = img / 255.
+#
+#     frames.append(img.numpy())
+# z=torch.FloatTensor(np.array(frames)).permute(1, 0, 2,3)
 
 
-train_dataset = CustomDataset(train['path'].values, train['label'].values)
+# frames = []
+# cap = cv2.VideoCapture('train/TRAIN_277.mp4')
+# for _ in range(CFG['FPS']):
+#     _, img = cap.read()
+#     img = cv2.resize(img, (CFG['IMG_SIZE'], CFG['IMG_SIZE']))
+#     img = img / 255.
+#     frames.append(img)
+# z=torch.FloatTensor(np.array(frames)).permute(3, 0, 1, 2)
+
+train_dataset = CustomDataset(train['path'].values, train['label'].values,train_transform)
 train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=0)
 
-val_dataset = CustomDataset(val['path'].values, val['label'].values)
+val_dataset = CustomDataset(val['path'].values, val['label'].values,train_transform)
 val_loader = DataLoader(val_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
 
 
@@ -144,7 +203,7 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
         _val_loss, _val_score = validation(model, criterion, val_loader, device)
         _train_loss = np.mean(train_loss)
         print(
-            f'Epoch [{epoch}], Train Loss : [{_train_loss:.5f}] Val Loss : [{_val_loss:.5f}] Val F1 : [{_val_score:.5f}]')
+            f'\n Epoch[{epoch}],TrainLoss:[{_train_loss:.3f}] ValLoss:[{_val_loss:.3f}] ValF1:[{_val_score:.3f}]')
 
         if scheduler is not None:
             scheduler.step(_val_score)
@@ -189,7 +248,7 @@ infer_model = train(model, optimizer, train_loader, val_loader, scheduler, devic
 
 test = pd.read_csv('./test.csv')
 
-test_dataset = CustomDataset(test['path'].values, None)
+test_dataset = CustomDataset(test['path'].values, None,test_transform)
 test_loader = DataLoader(test_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
 
 
@@ -215,5 +274,3 @@ submit.head()
 
 submit.to_csv('./baseline_submit.csv', index=False)
 
-T= pd.read_csv('./answer.csv')
-print(f1_score(list(T.label), preds, average='macro'))
